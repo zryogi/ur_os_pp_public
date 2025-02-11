@@ -274,6 +274,7 @@ public class SystemOS implements Runnable{
         System.out.println("Average Turnaround Time: "+this.calcTurnaroundTime());
         System.out.println("Average Waiting Time: "+this.calcAvgWaitingTime());
         System.out.println("Average Context Switches: "+this.calcAvgContextSwitches());
+        System.out.println("Average Response Time: "+this.calcResponseTime());
     }
     
     public void showProcesses(){
@@ -321,6 +322,11 @@ public class SystemOS implements Runnable{
         
         return (double)cont / processes.size();
     }
-    
+
+    public double calcResponseTime(){
+       
+        
+        return 0;
+    }
     
 }
