@@ -19,6 +19,7 @@ public class OS {
     private static int process_count = 0;
     SystemOS system;
     CPU cpu;
+    public final SchedulerType SCHEDULER_TYPE = SchedulerType.FCFS;
     
     public OS(SystemOS system, CPU cpu, IOQueue ioq){
         rq = new ReadyQueue(this);
@@ -47,6 +48,7 @@ public class OS {
                 if(p.isFinished()){//The process finished completely
                     p.setState(ProcessState.FINISHED);
                     p.setTime_finished(system.getTime());
+                    System.out.println("Process "+p.getPid()+" finished!");
                 }else{
                     ioq.addProcess(p);
                 }
@@ -62,6 +64,7 @@ public class OS {
                 rq.addProcess(temp);
                 if(p != null){
                     cpu.addProcess(p);
+                    System.out.println("Process "+p.getPid()+" was loaded!");
                 }
                 
             break;
@@ -70,7 +73,7 @@ public class OS {
             case SCHEDULER_RQ_TO_CPU:
                 //When the scheduler defined which process will go to CPU
                 cpu.addProcess(p);
-                
+                System.out.println("Process "+p.getPid()+" was loaded!");
             break;
             
             
