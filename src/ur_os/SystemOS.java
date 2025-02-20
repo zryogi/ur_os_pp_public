@@ -273,7 +273,8 @@ public class SystemOS implements Runnable{
         System.out.println("Throughput: "+this.calcThroughput());
         System.out.println("Average Turnaround Time: "+this.calcTurnaroundTime());
         System.out.println("Average Waiting Time: "+this.calcAvgWaitingTime());
-        System.out.println("Average Context Switches: "+this.calcAvgContextSwitches());
+        System.out.println("Average Context Switches (solo Gantt): "+this.calcAvgContextSwitches());
+        System.out.println("Average Context Switches (completo): "+this.calcAvgContextSwitches2());
         System.out.println("Average Response Time: "+this.calcResponseTime());
     }
     
