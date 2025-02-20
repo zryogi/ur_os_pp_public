@@ -19,18 +19,39 @@ public class ReadyQueue {
     
     public ReadyQueue(OS os){
         this.os = os;
+
+        switch(os.SCHEDULER_TYPE){
+            
+            case FCFS:
+                s = new FCFS(os);
+                break;
+            
+            case SJF_NP:
+                s = new SJF_NP(os);
+                break;
+            
+            case SJF_P:
+                s = new SJF_P(os);
+                break;
+            
+            case RR:
+                s = new RoundRobin(os,4);
+                break;
+            
+            case PRIORITY:
+                s = new PriorityQueue(os,new RoundRobin(os,9,false),new RoundRobin(os,6,false),new RoundRobin(os,3,false),new RoundRobin(os,2,false));
+                break;
+            
+            case MFQ:
+                s = new MFQ(os,new RoundRobin(os,3),new RoundRobin(os,6),new FCFS(os));
+                break;
+                
+            case FAIR   :
+                
+                break;
+        }
         
-        //s = new SJF_P(os);
         
-        //s = new SJF_NP(os);
-        
-        s = new FCFS(os);
-        
-        //s = new RoundRobin(os,6);
-        
-        //s = new MFQ(os,new RoundRobin(os,3),new RoundRobin(os,6),new FCFS(os));
-        
-        //s = new PriorityQueue(os,new RoundRobin(os,9),new RoundRobin(os,6),new RoundRobin(os,3));
     }
     
     public ReadyQueue(OS OS, Scheduler s){
