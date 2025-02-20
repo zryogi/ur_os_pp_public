@@ -324,6 +324,14 @@ public class SystemOS implements Runnable{
         return (double)cont / processes.size();
     }
 
+    public double calcAvgContextSwitches2(){
+        int cont = 1;
+        
+        
+        return (double)cont / processes.size();
+    }
+
+
     public double calcResponseTime(){
        
         
