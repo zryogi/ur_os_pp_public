@@ -11,7 +11,7 @@ package ur_os;
  */
 public class UR_OS {
 
-    private static String VERSION = "0.0.3.8.2";
+    private static String VERSION = "0.0.3.8.3";
     
     /**
      * @param args the command line arguments

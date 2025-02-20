@@ -15,11 +15,13 @@ public abstract class Scheduler {
     
     OS os;
     protected LinkedList<Process> processes;
+    private int totalContextSwitches;
     
     
     public Scheduler(OS os){
         this.os = os;
         processes = new LinkedList();
+        totalContextSwitches = 0;
     }
 
     public void getNext(){
@@ -30,13 +32,91 @@ public abstract class Scheduler {
     public abstract void newProcess(boolean cpuEmpty); //Implement for Preemtive schedulers
     public abstract void IOReturningProcess(boolean cpuEmpty); //Implement for Preemtive schedulers
     
+    public void addContextSwitch(){
+        this.totalContextSwitches++;
+    }
+    
+    public int getTotalContextSwitches(){
+        return this.totalContextSwitches;
+    }
     
     public boolean isEmpty(){
         return this.processes.isEmpty();
     }
     
-    public void addProcess(Process p){
+    public Process tieBreaker(Process p1, Process p2){
+        Process p = null;
+        switch(os.SCHEDULER_TIEBREAKER_TYPE){
         
+            case LARGEST_PID:
+                if(p1.getPid() > p2.getPid()){
+                    p = p1;
+                }else{
+                    p = p2;
+                }
+            break;
+            
+            case SMALLEST_PID:
+                if(p1.getPid() < p2.getPid()){
+                    p = p1;
+                }else{
+                    p = p2;
+                }
+            break;
+            
+            case PRIORITY:
+                if(p1.getPriority() < p2.getPriority()){
+                    p = p1;
+                }else{
+                    p = p2;
+                }
+            break;
+            
+            case PRIORITY_LARGEST_PID:
+                if(p1.getPriority() < p2.getPriority()){
+                    p = p1;
+                }else if(p1.getPriority() > p2.getPriority()){
+                    p = p2;
+                }else{
+                    if(p1.getPid() > p2.getPid()){
+                        p = p1;
+                    }else{
+                        p = p2;
+                    }
+                }
+            break;
+            
+            case PRIORITY_SMALLEST_PID:
+                if(p1.getPriority() < p2.getPriority()){
+                    p = p1;
+                }else if(p1.getPriority() > p2.getPriority()){
+                    p = p2;
+                }else{
+                    if(p1.getPid() < p2.getPid()){
+                        p = p1;
+                    }else{
+                        p = p2;
+                    }
+                }
+            break;
+            
+            default:
+                if(p1.getPid() > p2.getPid()){
+                    p = p1;
+                }else{
+                    p = p2;
+                }
+            break;
+            
+        
+        }
+        
+        return p;
+    }
+    
+    public void addProcess(Process p){
+        //The order in which process will be addedd to the ReadyQueue, based on the execution of the
+        //simulator, is: New processes, Interrupted processed from CPU, Incomming process from I/O
         if(p.getState() == ProcessState.NEW){
             newProcess(os.isCPUEmpty()); //If the process is NEW, let the scheduler defines what it will do to update the queue to select the next
         }else if(p.getState() == ProcessState.IO){
