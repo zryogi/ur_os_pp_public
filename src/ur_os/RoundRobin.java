@@ -12,13 +12,13 @@ public class RoundRobin extends Scheduler{
 
     int q;
     int cont;
-    boolean multiqueue;
+    boolean singlequeue;
     
     RoundRobin(OS os){
         super(os);
         q = 5;
         cont=0;
-        multiqueue = false;
+        singlequeue = true;
     }
     
     RoundRobin(OS os, int q){
@@ -26,7 +26,7 @@ public class RoundRobin extends Scheduler{
         this.q = q;
     }
 
-    RoundRobin(OS os, int q, boolean multiqueue){
+    RoundRobin(OS os, int q, boolean singlequeue){
         this(os);
         this.q = q;
         this.multiqueue = multiqueue;
