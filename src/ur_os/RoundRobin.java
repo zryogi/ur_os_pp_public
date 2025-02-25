@@ -29,7 +29,7 @@ public class RoundRobin extends Scheduler{
     RoundRobin(OS os, int q, boolean singlequeue){
         this(os);
         this.q = q;
-        this.multiqueue = multiqueue;
+        this.singlequeue = singlequeue;
     }
     
 
