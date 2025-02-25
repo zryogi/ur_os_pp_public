@@ -75,7 +75,10 @@ public class ReadyQueue {
         
         return s.toString();
     }
-    
+
+    public int getTotalContextSwitches(){
+        return s.getTotalContextSwitches();
+    }
    
     
 }
