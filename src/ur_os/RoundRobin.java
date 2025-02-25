@@ -18,6 +18,7 @@ public class RoundRobin extends Scheduler{
         super(os);
         q = 5;
         cont=0;
+        multiqueue = false;
     }
     
     RoundRobin(OS os, int q){
