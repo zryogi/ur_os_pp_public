@@ -11,7 +11,7 @@ package ur_os;
  */
 public class UR_OS {
 
-    private static String VERSION = "0.0.3.8.4";
+    private static String VERSION = "0.0.3.9";
     
     /**
      * @param args the command line arguments
@@ -22,8 +22,9 @@ public class UR_OS {
         System.out.println("************************************");
         System.out.println("         UR_OS V."+VERSION);
         System.out.println("************************************");
-        
-        SystemOS system = new SystemOS();
+
+        boolean menu = false;
+        SystemOS system = new SystemOS(menu);
         
         new Thread(system).start();
         

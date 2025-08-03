@@ -5,41 +5,71 @@
  */
 package ur_os;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
+import java.util.Scanner;
+import static ur_os.SchedulerType.FAIR;
+import static ur_os.SchedulerType.PRIORITY;
+import static ur_os.SchedulerType.RR;
+import ur_os.CreateFile;
+import static ur_os.CreateFile.returnFile;
+
+
 
 /**
  *
  * @author super
  */
-public class SystemOS implements Runnable{
+public final class SystemOS implements Runnable{
+    
+    
     
     private static int clock = 0;
     private static final int MAX_SIM_CYCLES = 1000;
     private static final int MAX_SIM_PROC_CREATION_TIME = 50;
     private static final double PROB_PROC_CREATION = 0.1;
     private static Random r = new Random(1235);
+    private int CPUUtilization = 0; // Tiempo que la CPU estuvo ocupada
+    private int cpucount = 0; // Contador de ciclos de CPU utilizados
+    private ArrayList<Process> processes; // Lista de procesos
+    private ArrayList<Integer> execution; // Lista de ejecución de procesos
     private OS os;
     private CPU cpu;
     private IOQueue ioq;
+    private ReadyQueue readyqueue;
+    private SchedulerType selectedScheduler;
     
-    protected ArrayList<Process> processes;
-    ArrayList<Integer> execution;
-
+    private int simulation;
+    boolean menu = false;
+ 
     public SystemOS() {
+        this(false);
+    }
+    
+    public SystemOS(boolean menu) {
         cpu = new CPU();
         ioq = new IOQueue();
-        os = new OS(this, cpu, ioq);
+        if(menu){
+            menu();
+        }else{
+            selectedScheduler = SchedulerType.FCFS;
+            simulation = 3; //Simpler2
+        }
+        
+        readyqueue = new ReadyQueue(os,selectedScheduler);
+        os = new OS(this, cpu, ioq , selectedScheduler );
         cpu.setOS(os);
         ioq.setOS(os);
         execution = new ArrayList();
         processes = new ArrayList();
-        //initSimulationQueue();
-        //initSimulationQueueSimple();
-        initSimulationQueueSimpler2();
-        showProcesses();
+        
+        simulation(simulation);
+
     }
     
     public int getTime(){
@@ -71,6 +101,28 @@ public class SystemOS implements Runnable{
             clock++;
         }
         clock = 0;
+    }
+    
+    
+    public void simulation(int simulation){
+        switch(simulation){
+            case 1 -> {
+                initSimulationQueue();
+                showProcesses();
+            }
+            case 2 -> {
+                initSimulationQueueSimpler();
+                showProcesses();
+            }
+            case 3 -> {
+                initSimulationQueueSimpler2();
+                showProcesses();
+            }
+            case 4 -> {
+                initSimulationQueueSimpler3();
+                showProcesses();
+            }
+        }
     }
     
     public void initSimulationQueueSimple(){
@@ -191,6 +243,57 @@ public class SystemOS implements Runnable{
         clock = 0;
     }
     
+
+    public void initSimulationQueueSimpler3(){ //quiz
+        
+        Process p = new Process(false);
+        p.setPriority(0);
+        ProcessBurst temp = new ProcessBurst(6,ProcessBurstType.CPU);    
+        p.addBurst(temp);
+        temp = new ProcessBurst(2,ProcessBurstType.IO);    
+        p.addBurst(temp);
+        temp = new ProcessBurst(4,ProcessBurstType.CPU);    
+        p.addBurst(temp);
+        p.setTime_init(0);
+        processes.add(p);
+        
+        
+        p = new Process(false);
+        p.setPriority(1);
+        temp = new ProcessBurst(2,ProcessBurstType.CPU);    
+        p.addBurst(temp);
+        temp = new ProcessBurst(5,ProcessBurstType.IO);    
+        p.addBurst(temp);
+        temp = new ProcessBurst(5,ProcessBurstType.CPU);    
+        p.addBurst(temp);
+        p.setTime_init(3);
+        processes.add(p);
+        
+        p = new Process(false);
+        p.setPriority(2);
+        temp = new ProcessBurst(3,ProcessBurstType.CPU);    
+        p.addBurst(temp);
+        temp = new ProcessBurst(1,ProcessBurstType.IO);    
+        p.addBurst(temp);
+        temp = new ProcessBurst(6,ProcessBurstType.CPU);    
+        p.addBurst(temp);
+        p.setTime_init(5);
+        processes.add(p);
+        
+        p = new Process(false);
+        p.setPriority(3);
+        temp = new ProcessBurst(4,ProcessBurstType.CPU);    
+        p.addBurst(temp);
+        temp = new ProcessBurst(4,ProcessBurstType.IO);    
+        p.addBurst(temp);
+        temp = new ProcessBurst(7,ProcessBurstType.CPU);    
+        p.addBurst(temp);
+        p.setTime_init(8);
+        processes.add(p);
+        
+        clock = 0;
+    }
+    
     public boolean isSimulationFinished(){
         
         boolean finished = true;
@@ -203,24 +306,67 @@ public class SystemOS implements Runnable{
     
     }
     
+    public void menu() {
+        
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("===== Menu =====");
+        System.out.println("1. FCFS");
+        System.out.println("2. SJF No Preventivo");
+        System.out.println("3. SJF Preventivo");
+        System.out.println("4. Round Robin");
+        System.out.println("5. Por Prioridades");
+        System.out.println("6. MFQ");
+        System.out.println("7. Fair Scheduler");
+        System.out.print("Select the algorithm (1-7): ");
+
+        int schedulerChoice = scanner.nextInt();
+        scanner.nextLine(); // Limpiar buffer
+
+        selectedScheduler = switch (schedulerChoice) {
+            case 1 -> SchedulerType.FCFS;
+            case 2 -> SchedulerType.SJF_NP;
+            case 3 -> SchedulerType.SJF_P;
+            case 4 -> SchedulerType.RR;
+            case 5 -> SchedulerType.PRIORITY;
+            case 6 -> SchedulerType.MFQ;
+            case 7 -> SchedulerType.FAIR;
+            default -> throw new IllegalArgumentException("Scheduler inválido");
+        };
+
+        readyqueue = new ReadyQueue(os, selectedScheduler);  
+
+        System.out.println("\n===== Simulation Menu =====");
+        System.out.println("1. initSimulationQueue");
+        System.out.println("2. initSimulationQueueSimpler");
+        System.out.println("3. initSimulationQueueSimpler2");
+        System.out.print("Select the simulation (1-3): ");
+        simulation = scanner.nextInt();
+        scanner.nextLine(); // Limpiar buffer
+    }
+
+
     
     @Override
     public void run() {
+        
         double tp;
         ArrayList<Process> ps;
         
-        System.out.println("******SIMULATION START******");
+        System.out.println("***SIMULATION START***");
         
         int i=0;
         Process temp_exec;
         int tempID;
         while(!isSimulationFinished() && i < MAX_SIM_CYCLES){//MAX_SIM_CYCLES is the maximum simulation time, to avoid infinite loops
-            System.out.println("******Clock: "+i+"******");
+            System.out.println("***Clock: "+i+"***");
             System.out.println(cpu);
             System.out.println(ioq);
-            if(i == 32){
+            
+            if(i == 32){ //This allows you to stop the simulation at a given time (i) if a debugging stoping point is located here
                 int a=0;
             }
+            
             //Crear procesos, si aplica en el ciclo actual
             ps = getProcessAtI(i);
             for (Process p : ps) {
@@ -236,10 +382,14 @@ public class SystemOS implements Runnable{
             clock++;
             
             temp_exec = cpu.getProcess();
-            if(temp_exec == null){
+            if (temp_exec == null) {
                 tempID = -1;
-            }else{
+                cpucount++;
+            } else {
                 tempID = temp_exec.getPid();
+                if (temp_exec.getFirstExecutionTime() == -1) {
+                    temp_exec.setFirstExecutionTime(clock);
+                }
             }
             execution.add(tempID);
             
@@ -258,27 +408,60 @@ public class SystemOS implements Runnable{
             i++;
 
         }
-        System.out.println("******SIMULATION FINISHES******");
-        //os.showProcesses();
         
-        System.out.println("******Process Execution******");
-        for (Integer num : execution) {
-            System.out.print(num+" ");
+        
+        try (PrintWriter pw = new PrintWriter(new FileWriter(returnFile()))) {
+            pw.println("***SIMULATION FINISHES***");
+
+            // os.showProcesses(); // Si quieres imprimir procesos, hazlo también aquí
+
+            pw.println("***Process Execution***");
+            for (Integer num : execution) {
+                pw.print(num + " ");
+            }
+            pw.println();
+
+            pw.println("***Performance Indicators***");
+            pw.println("Total execution cycles: " + clock);
+            pw.println("CPU Utilization: " + this.calcCPUUtilization());
+            pw.println("Throughput: " + this.calcThroughput());
+            pw.println("Average Turnaround Time: " + this.calcTurnaroundTime());
+            pw.println("Average Waiting Time: " + this.calcAvgWaitingTime());
+            pw.println("Average Context Switches (solo Gantt): " + this.calcAvgContextSwitches());
+            pw.println("Average Context Switches (completo): " + this.calcAvgContextSwitches2());
+            pw.println("Average Response Time: " + this.calcResponseTime());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        System.out.println("");
         
-        System.out.println("******Performance Indicators******");
-        System.out.println("Total execution cycles: "+clock);
-        System.out.println("CPU Utilization: "+this.calcCPUUtilization());
-        System.out.println("Throughput: "+this.calcThroughput());
-        System.out.println("Average Turnaround Time: "+this.calcTurnaroundTime());
-        System.out.println("Average Waiting Time: "+this.calcAvgWaitingTime());
-        System.out.println("Average Context Switches (solo Gantt): "+this.calcAvgContextSwitches());
-        System.out.println("Average Context Switches (completo): "+this.calcAvgContextSwitches2());
-        System.out.println("Average Response Time: "+this.calcResponseTime());
+        
+        System.out.println("***SIMULATION FINISHES***");
+
+        // os.showProcesses(); // Si quieres imprimir procesos, hazlo también aquí
+
+        System.out.println("***Process Execution***");
+        for (Integer num : execution) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+
+        System.out.println("***Performance Indicators***");
+        System.out.println("Total execution cycles: " + clock);
+        System.out.println("CPU Utilization: " + this.calcCPUUtilization());
+        System.out.println("Throughput: " + this.calcThroughput());
+        System.out.println("Average Turnaround Time: " + this.calcTurnaroundTime());
+        System.out.println("Average Waiting Time: " + this.calcAvgWaitingTime());
+        System.out.println("Average Context Switches (solo Gantt): " + this.calcAvgContextSwitches());
+        System.out.println("Average Context Switches (completo): " + this.calcAvgContextSwitches2());
+        System.out.println("Average Response Time: " + this.calcResponseTime());
+        
+        
+        System.out.println("*********Comparation:************************");
+        compareFiles("C:/Users/Lenovo/Documents/UNIVERSIDAD DEL ROSARIO/V SEMESTRE/Operating System/UR_OS/FCFS.txt", "C:/Users/Lenovo/Documents/UNIVERSIDAD DEL ROSARIO/V SEMESTRE/Operating System/FCFS.txt");
+        
     }
     
-    public void showProcesses(){
+    public void showProcesses() {
         System.out.println("Process list:");
         StringBuilder sb = new StringBuilder();
         
@@ -290,52 +473,73 @@ public class SystemOS implements Runnable{
         System.out.println(sb.toString());
     }
     
+    public double calcCPUUtilization() {
+        
+        return 0; // Mantiene el cálculo correcto
+    }
     
-    public double calcCPUUtilization(){
-       
+    public double calcTurnaroundTime() {
+        
+    
+        return 0;
+    }
+    
+    public double calcThroughput() {
+        if (processes.isEmpty()) return 0;
+    
+        return 0; // Procesos terminados por unidad de tiempo
+    }
+    
+    public double calcAvgWaitingTime() {
+           
+        return 0;
+    }
+    
+    //Everytime a process is taken out from memory, when a interruption occurs
+    public double calcAvgContextSwitches() {
         
         return 0;
     }
     
-    public double calcTurnaroundTime(){
-        
-        double tot = 0;
-        
-       
-        
-        return tot/processes.size();
-    }
     
-    public double calcThroughput(){
+    //Just context switches based on the execution timeline
+    public double calcAvgContextSwitches2() {
+        
         return 0;
     }
     
-    public double calcAvgWaitingTime(){
-        double tot = 0;
-        
-        
-        return tot/processes.size();
-    }
     
-    public double calcAvgContextSwitches(){
-        int cont = 1;
-        
-        
-        return (double)cont / processes.size();
-    }
-
-    public double calcAvgContextSwitches2(){
-        int cont = 1;
-        
-        
-        return (double)cont / processes.size();
-    }
-
-
-    public double calcResponseTime(){
-       
+    public double calcResponseTime() {
         
         return 0;
+
     }
+    public void compareFiles(String filePath1, String filePath2) {
+        try (BufferedReader reader1 = new BufferedReader(new FileReader(filePath1));
+             BufferedReader reader2 = new BufferedReader(new FileReader(filePath2))) {
+
+            String line1, line2;
+            int lineNum = 1;
+            boolean differenceFound = false;
+
+            while ((line1 = reader1.readLine()) != null | (line2 = reader2.readLine()) != null) {
+                if (line1 == null || line2 == null || !line1.equals(line2)) {
+                    System.out.println("Difference at line " + lineNum + ":");
+                    System.out.println("File1: " + (line1 != null ? line1 : "[EOF]"));
+                    System.out.println("File2: " + (line2 != null ? line2 : "[EOF]"));
+                    differenceFound = true;
+                }
+                lineNum++;
+            }
+            if (!differenceFound) {
+                System.out.println("The files are identical.");
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error comparing files: " + e.getMessage());
+        }
+    }
+    
+    
     
 }

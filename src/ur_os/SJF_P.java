@@ -4,6 +4,10 @@
  */
 package ur_os;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
  * @author prestamour
@@ -13,6 +17,7 @@ public class SJF_P extends Scheduler{
     
     SJF_P(OS os){
         super(os);
+
     }
     
     @Override
@@ -22,13 +27,15 @@ public class SJF_P extends Scheduler{
 
     @Override
     public void IOReturningProcess(boolean cpuEmpty){// When a process return from IO and enters the queue, process in CPU, if any, is extracted to compete with the rest
-                
+        
     } 
     
    
     @Override
     public void getNext(boolean cpuEmpty) {
-       
-    }
-    
+        
+        //Insert code here
+
+     }
+ 
 }

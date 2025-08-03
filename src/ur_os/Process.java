@@ -23,6 +23,7 @@ public class Process implements Comparable{
     int currentScheduler;
     int priority;
     Random r;
+    private int responseTime;
 
 
     public Process() {
@@ -70,6 +71,34 @@ public class Process implements Comparable{
     public boolean isFinished(){
         return pbl.isFinished();
     }
+    private int contextSwitches = 0;
+    
+    public int getContextSwitches() {
+    return contextSwitches;
+}
+    public void increaseContextSwitches() {
+    contextSwitches++;
+}
+    private int firstExecutionTime = -1;
+
+    public void setFirstExecutionTime(int time) {
+        if (firstExecutionTime == -1) { // Solo se asigna la primera vez
+            this.firstExecutionTime = time;
+        }
+    }
+
+
+    public Integer getFirstExecutionTime() {
+        return firstExecutionTime;
+    }
+
+    public int getResponseTime() {
+        if (firstExecutionTime == -1) { 
+            return -1; // Indicar que aún no ha sido ejecutado
+        }
+        return firstExecutionTime - time_init;
+    }
+
 
     public void setTime_finished(int time_finished) {
         this.time_finished = time_finished;
@@ -120,6 +149,7 @@ public class Process implements Comparable{
         return pbl.getRemainingTimeInCurrentBurst();
     }
     
+    
     public boolean isCurrentBurstCPU(){
         return pbl.isCurrentBurstCPU();
     }
@@ -161,7 +191,14 @@ public class Process implements Comparable{
         
         return -1;
     }
-    
+    public int getIoCompletionTime() {
+        return pbl.getNextIOCompletionTime();
+    }
+
+    public int getBurstTime() {
+        return pbl.getTotalExecutionTime();  // Usa un método adecuado de ProcessBurstList
+    }
+
     @Override
     public boolean equals(Object o){
     
@@ -173,6 +210,10 @@ public class Process implements Comparable{
         return false;
         
     }
-    
-    
+
+    public void setResponseTime(int responseTime) {
+        if (this.responseTime == -1) { // Solo se establece una vez
+            this.responseTime = responseTime;
+        }
+    }
 }

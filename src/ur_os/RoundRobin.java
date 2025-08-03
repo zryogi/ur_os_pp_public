@@ -12,13 +12,12 @@ public class RoundRobin extends Scheduler{
 
     int q;
     int cont;
-    boolean singlequeue;
+    boolean multiqueue;
     
     RoundRobin(OS os){
         super(os);
         q = 5;
         cont=0;
-        singlequeue = true;
     }
     
     RoundRobin(OS os, int q){
@@ -26,10 +25,10 @@ public class RoundRobin extends Scheduler{
         this.q = q;
     }
 
-    RoundRobin(OS os, int q, boolean singlequeue){
+    RoundRobin(OS os, int q, boolean multiqueue){
         this(os);
         this.q = q;
-        this.singlequeue = singlequeue;
+        this.multiqueue = multiqueue;
     }
     
 
@@ -40,8 +39,7 @@ public class RoundRobin extends Scheduler{
    
     @Override
     public void getNext(boolean cpuEmpty) {
-        
-        
+        //Insert code here
     }
     
     
