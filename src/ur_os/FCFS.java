@@ -26,10 +26,12 @@ public class FCFS extends Scheduler{
     }
 
     @Override
-    public void newProcess(boolean cpuEmpty) {} //Non-preemtive
+    public void newProcess(boolean cpuEmpty) {
+    } //Non-preemtive
 
     @Override
-    public void IOReturningProcess(boolean cpuEmpty) {} //Non-preemtive
+    public void IOReturningProcess(boolean cpuEmpty) {
+    } //Non-preemtive
     
     
     

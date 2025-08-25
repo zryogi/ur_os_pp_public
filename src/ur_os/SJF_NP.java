@@ -8,6 +8,7 @@ package ur_os;
  *
  * @author prestamour
  */
+// @TODO alugo
 public class SJF_NP extends Scheduler{
 
     

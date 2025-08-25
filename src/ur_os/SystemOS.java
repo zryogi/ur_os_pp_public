@@ -457,7 +457,7 @@ public final class SystemOS implements Runnable{
         
         
         System.out.println("*********Comparation:************************");
-        compareFiles("C:/Users/Lenovo/Documents/UNIVERSIDAD DEL ROSARIO/V SEMESTRE/Operating System/UR_OS/FCFS.txt", "C:/Users/Lenovo/Documents/UNIVERSIDAD DEL ROSARIO/V SEMESTRE/Operating System/FCFS.txt");
+        compareFiles("FCFS.txt", "FCFS.txt");
         
     }
     
@@ -472,47 +472,128 @@ public final class SystemOS implements Runnable{
         
         System.out.println(sb.toString());
     }
+
+    public int processTurnAroundTime(Process p) {
+        if (p.getTime_finished() == -1) return 0;
+        return p.getTime_finished() - p.getTime_init();
+    }
+
+    public int getFinishedProcesses() {
+        if (processes.isEmpty()) return 0;
+
+        int finished = 0;
+
+        for (Process p : processes) {
+            if (p.getTime_finished() != -1) finished++;
+        }
+
+        return finished;
+    }
     
     public double calcCPUUtilization() {
+        if (clock == 0) return 0;
         
-        return 0; // Mantiene el cálculo correcto
+        return (double) (clock - cpucount) / clock; 
     }
     
     public double calcTurnaroundTime() {
+        if (processes.isEmpty()) return 0;
         
-    
-        return 0;
+        int totalTurnaroundTime = 0;
+
+        int finishedProcesses = getFinishedProcesses();
+        if (finishedProcesses == 0) return 0;
+        
+        for (Process p : processes) {
+            if (p.getTime_finished() != -1) {
+                totalTurnaroundTime += processTurnAroundTime(p);
+            }
+        }
+        
+        return (double) totalTurnaroundTime / finishedProcesses;
     }
     
     public double calcThroughput() {
-        if (processes.isEmpty()) return 0;
+        if (processes.isEmpty() || clock == 0) return 0;
     
-        return 0; // Procesos terminados por unidad de tiempo
+        return (double) processes.size() / clock; 
     }
     
     public double calcAvgWaitingTime() {
-           
-        return 0;
-    }
-    
-    //Everytime a process is taken out from memory, when a interruption occurs
-    public double calcAvgContextSwitches() {
+        if (processes.isEmpty()) return 0;
         
-        return 0;
+        int totalWaitingTime = 0;
+
+        int finishedProcesses = getFinishedProcesses();
+        if (finishedProcesses == 0) return 0;
+
+        for (Process p : processes) {
+            if (p.getTime_finished() != -1) {
+                int totalExecTime = processTurnAroundTime(p);
+                int idealExecTime = p.getTotalExecutionTime();
+                int waitingTime = totalExecTime - idealExecTime;
+                
+                totalWaitingTime += waitingTime;
+            }
+        }
+        
+        return (double) totalWaitingTime / finishedProcesses;
     }
     
+    //Everytime a process is taken out from memory, when an interruption occurs
+    public double calcAvgContextSwitches() {
+        if (processes.isEmpty()) return 0;
+
+        int finishedProcesses = getFinishedProcesses();
+        if (finishedProcesses == 0) return 0;
+
+        int totalContextSwitches = 0;
+
+        for (Process p : processes) {
+            if (p.getTime_finished() != -1) {
+                totalContextSwitches += p.getContextSwitches();
+            }
+        }
+
+        return (double) totalContextSwitches / finishedProcesses;
+    }
     
     //Just context switches based on the execution timeline
     public double calcAvgContextSwitches2() {
+        if (execution.isEmpty() || processes.isEmpty()) return 0;
+
+        int finishedProcesses = getFinishedProcesses();
+        if (finishedProcesses == 0) return 0;
         
-        return 0;
+        int contextSwitches = 0;
+        int lastPid = Integer.MIN_VALUE;
+
+        for (Integer currentPid : execution) {
+            if (currentPid != lastPid && currentPid >= 0) {
+                contextSwitches++;
+            }
+            lastPid = currentPid;
+        }
+        
+        return (double) contextSwitches / finishedProcesses;
     }
     
     
     public double calcResponseTime() {
-        
-        return 0;
+        if (processes.isEmpty()) return 0;
 
+        int finishedProcesses = getFinishedProcesses();
+        if (finishedProcesses == 0) return 0;
+
+        int totalResponseTime = 0;
+
+        for (Process p : processes) {
+            if (p.getTime_finished() != -1) {
+                totalResponseTime += p.getResponseTime();
+            }
+        }
+        
+        return (double) totalResponseTime / finishedProcesses;
     }
     public void compareFiles(String filePath1, String filePath2) {
         try (BufferedReader reader1 = new BufferedReader(new FileReader(filePath1));

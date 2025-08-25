@@ -45,16 +45,21 @@ public class OS {
                     System.out.println("Process " + p.getPid() + " finished!");
                 } else {
                     ioq.addProcess(p);
+                    p.increaseContextSwitches();
                 }
                 break;
 
             case IO:
                 rq.addProcess(p);
+                p.increaseContextSwitches();
                 break;
 
             case SCHEDULER_CPU_TO_RQ:
                 Process temp = cpu.extractProcess();
                 rq.addProcess(temp);
+                if (temp != null) {
+                    temp.increaseContextSwitches();
+                }
                 if (p != null) {
                     cpu.addProcess(p);
                     System.out.println("Process " + p.getPid() + " was loaded!");

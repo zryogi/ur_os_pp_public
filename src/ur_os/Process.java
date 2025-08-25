@@ -11,7 +11,7 @@ import java.util.Random;
  *
  * @author super
  */
-public class Process implements Comparable{
+public class Process implements Comparable {
     public static final int NUM_CPU_CYCLES = 3;
     public static final int MAX_CPU_CYCLES = 10;
     public static final int MAX_IO_CYCLES = 10;

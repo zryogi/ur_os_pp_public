@@ -20,7 +20,7 @@ public abstract class Scheduler {
     
     public Scheduler(OS os){
         this.os = os;
-        processes = new LinkedList();
+        processes = new LinkedList<Process>();
         totalContextSwitches = 0;
     }
 
@@ -47,7 +47,7 @@ public abstract class Scheduler {
     public Process tieBreaker(Process p1, Process p2){
         Process p = null;
         switch(os.SCHEDULER_TIEBREAKER_TYPE){
-        
+
             case LARGEST_PID:
                 if(p1.getPid() > p2.getPid()){
                     p = p1;

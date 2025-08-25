@@ -8,16 +8,16 @@ package ur_os;
  *
  * @author prestamour
  */
-public class RoundRobin extends Scheduler{
+public class RoundRobin extends Scheduler {
 
     int q;
     int cont;
-    boolean multiqueue;
+    boolean multiQueue;
     
     RoundRobin(OS os){
         super(os);
-        q = 5;
-        cont=0;
+        this.q = 5;
+        this.cont = 0;
     }
     
     RoundRobin(OS os, int q){
@@ -25,24 +25,21 @@ public class RoundRobin extends Scheduler{
         this.q = q;
     }
 
-    RoundRobin(OS os, int q, boolean multiqueue){
+    RoundRobin(OS os, int q, boolean multiQueue){
         this(os);
         this.q = q;
-        this.multiqueue = multiqueue;
+        this.multiQueue = multiQueue;
     }
-    
 
-    
     void resetCounter(){
-        cont=0;
+        cont = 0;
     }
    
     @Override
     public void getNext(boolean cpuEmpty) {
         //Insert code here
     }
-    
-    
+
     @Override
     public void newProcess(boolean cpuEmpty) {} //Non-preemtive in this event
 
