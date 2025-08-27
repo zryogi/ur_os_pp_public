@@ -9,7 +9,6 @@ package ur_os;
  * @author prestamour
  */
 public class SJF_NP extends Scheduler {
-
     SJF_NP(OS os){
         super(os);
     }
