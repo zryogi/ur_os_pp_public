@@ -57,8 +57,8 @@ public final class SystemOS implements Runnable{
         if(menu){
             menu();
         }else{
-            selectedScheduler = SchedulerType.FCFS;
-            simulation = 3; //Simpler2
+            selectedScheduler = SchedulerType.SJF_NP;
+            simulation = 2; //Simpler2
         }
         
         readyqueue = new ReadyQueue(os,selectedScheduler);

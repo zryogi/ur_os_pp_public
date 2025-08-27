@@ -38,30 +38,16 @@ public class SJF_P extends Scheduler {
             }
         }
     } 
-    
-   
+
     @Override
     public void getNext(boolean cpuEmpty) {
         if (!processes.isEmpty() && cpuEmpty) {
-            Process shortestProcess = null;
-            int shortestTime = Integer.MAX_VALUE;
-            
-            for (Process p : processes) {
-                int remainingTime = p.getRemainingTimeInCurrentBurst();
+            Process shortestProcess = SJFUtils.getShortestJobProcess(processes, this);
 
-                if (remainingTime < shortestTime) {
-                    shortestTime = remainingTime;
-                    shortestProcess = p;
-                } else if (remainingTime == shortestTime && shortestProcess != null) {
-                    shortestProcess = tieBreaker(p, shortestProcess);
-                }
-            }
-            
             if (shortestProcess != null) {
                 processes.remove(shortestProcess);
                 os.interrupt(InterruptType.SCHEDULER_RQ_TO_CPU, shortestProcess);
             }
         }
     }
- 
 }
