@@ -65,8 +65,8 @@ public final class SystemOS implements Runnable{
         os = new OS(this, cpu, ioq , selectedScheduler );
         cpu.setOS(os);
         ioq.setOS(os);
-        execution = new ArrayList();
-        processes = new ArrayList();
+        execution = new ArrayList<>();
+        processes = new ArrayList<>();
         
         simulation(simulation);
 
@@ -77,7 +77,7 @@ public final class SystemOS implements Runnable{
     }
     
     public ArrayList<Process> getProcessAtI(int i){
-        ArrayList<Process> ps = new ArrayList();
+        ArrayList<Process> ps = new ArrayList<>();
         
         for (Process process : processes) {
             if(process.getTime_init() == i){
@@ -620,7 +620,4 @@ public final class SystemOS implements Runnable{
             System.err.println("Error comparing files: " + e.getMessage());
         }
     }
-    
-    
-    
 }
