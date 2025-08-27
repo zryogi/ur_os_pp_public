@@ -25,10 +25,7 @@ import static ur_os.CreateFile.returnFile;
  *
  * @author super
  */
-public final class SystemOS implements Runnable{
-    
-    
-    
+public final class SystemOS implements Runnable{ 
     private static int clock = 0;
     private static final int MAX_SIM_CYCLES = 1000;
     private static final int MAX_SIM_PROC_CREATION_TIME = 50;
@@ -57,7 +54,7 @@ public final class SystemOS implements Runnable{
         if(menu){
             menu();
         }else{
-            selectedScheduler = SchedulerType.FCFS;
+            selectedScheduler = SchedulerType.RR;
             simulation = 3; //Simpler2
         }
         
