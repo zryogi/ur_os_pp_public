@@ -42,14 +42,14 @@ public class RoundRobin extends Scheduler {
             if (cont > q) { //checks if time spent surpasses the time quantum chosen
                 Process p = null;
                 if (!processes.isEmpty()) {  //runs when processes is NOT empty
-                    p = processes.get(0); // sets p as first process in queue
+                    p = processes.getFirst(); // sets p as first process in queue
                     processes.remove();//removes said process from queue
                 }
                 os.interrupt(InterruptType.SCHEDULER_CPU_TO_RQ, p);
                 cont = 1; //restarts the count of time spent
             }
         } else if (!processes.isEmpty()) { //runs when processes is NOT empty
-            Process p = processes.get(0); // sets p as first process in queue
+            Process p = processes.getFirst(); // sets p as first process in queue
             processes.remove(); //removes said process from queue
             os.interrupt(InterruptType.SCHEDULER_RQ_TO_CPU, p);
             cont = 1; //restarts the count of time spent
