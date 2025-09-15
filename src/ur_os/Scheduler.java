@@ -15,13 +15,36 @@ public abstract class Scheduler {
     
     OS os;
     protected LinkedList<Process> processes;
+    public Scheduler() {}
     private int totalContextSwitches;
-    
+
+    public boolean isQuantumExceeded() {
+        return quantumExceeded;
+    }
+
+    public void setQuantumExceeded(boolean quantumExceeded) {
+        this.quantumExceeded = quantumExceeded;
+    }
+
+    private boolean quantumExceeded;
+
+    public boolean isStopAtQuantumExceeded() {
+        return stopAtQuantumExceeded;
+    }
+
+    public void setStopAtQuantumExceeded(boolean stopAtQuantumExceeded) {
+        this.stopAtQuantumExceeded = stopAtQuantumExceeded;
+    }
+
+    private boolean stopAtQuantumExceeded;
+
     
     public Scheduler(OS os){
         this.os = os;
         processes = new LinkedList<Process>();
         totalContextSwitches = 0;
+        quantumExceeded = false;
+        stopAtQuantumExceeded = false;
     }
 
     public void getNext(){

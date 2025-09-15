@@ -6,7 +6,7 @@ public class OS {
 
     ReadyQueue rq;
     IOQueue ioq;
-    private static int process_count = 0;
+    private int process_count = 0;
     SystemOS system;
     CPU cpu;
 
@@ -14,14 +14,13 @@ public class OS {
 
     public final TieBreakerType SCHEDULER_TIEBREAKER_TYPE = TieBreakerType.LARGEST_PID;
 
-    
-
     public OS(SystemOS system, CPU cpu, IOQueue ioq, SchedulerType schedulerType) {
         this.system = system;
         this.cpu = cpu;
         this.ioq = ioq;
         this.currentSchedulerType = schedulerType;
         this.rq = new ReadyQueue(this, currentSchedulerType);
+        this.process_count = 0;
     }
 
     public void update() {

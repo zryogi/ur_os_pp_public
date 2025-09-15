@@ -30,28 +30,30 @@ public class RoundRobin extends Scheduler {
         this.q = q;
         this.multiQueue = multiQueue;
     }
-
-    void resetCounter(){
-        cont = 0;
-    }
    
     @Override
     public void getNext(boolean cpuEmpty) {
+        setQuantumExceeded(false);
         if (!cpuEmpty) { //runs when CPU is NOT empty
-            cont += 1; //adds time unit for the time spent in the current process
+            cont++; //adds time unit for the time spent in the current process
             if (cont > q) { //checks if time spent surpasses the time quantum chosen
-                Process p = null;
-                if (!processes.isEmpty()) {  //runs when processes is NOT empty
-                    p = processes.getFirst(); // sets p as first process in queue
-                    processes.remove();//removes said process from queue
+                setQuantumExceeded(true);
+                if(isStopAtQuantumExceeded()) {
+                    cont = 1;
+                    os.interrupt(InterruptType.SCHEDULER_CPU_TO_RQ, null);
+                    return;
                 }
-                os.interrupt(InterruptType.SCHEDULER_CPU_TO_RQ, p);
+                if (!processes.isEmpty()) {  //runs when processes is NOT empty
+                    os.interrupt(InterruptType.SCHEDULER_CPU_TO_RQ, processes.poll());
+                } else {
+                    // No other processes waiting, but quantum expired
+                    os.getProcessInCPU().increaseContextSwitches();
+                }
                 cont = 1; //restarts the count of time spent
+                setQuantumExceeded(false);
             }
         } else if (!processes.isEmpty()) { //runs when processes is NOT empty
-            Process p = processes.getFirst(); // sets p as first process in queue
-            processes.remove(); //removes said process from queue
-            os.interrupt(InterruptType.SCHEDULER_RQ_TO_CPU, p);
+            os.interrupt(InterruptType.SCHEDULER_RQ_TO_CPU, processes.poll());
             cont = 1; //restarts the count of time spent
         }
     }
