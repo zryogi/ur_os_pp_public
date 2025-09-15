@@ -1,20 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ur_os;
 
 import java.util.*;
 
-/**
- * Priority Queue Scheduler Implementation
- * Based on Operating System Concepts by Silberschatz, Galvin, and Gagne
- *
- * This implements a multilevel priority queue where:
- * - Lower priority numbers indicate higher priority processes
- * - Higher priority processes can preempt lower priority ones
- * - Each priority level uses Round Robin scheduling with different time quanta
- */
 public class PriorityQueue extends Scheduler {
 
     int currentScheduler;
