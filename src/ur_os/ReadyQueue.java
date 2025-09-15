@@ -5,11 +5,9 @@ import static ur_os.CreateFile.createSchedulerFile;
 import static ur_os.SchedulerType.FCFS;
 
 public class ReadyQueue {
-    
-    
+
     Scheduler s;
     OS os;
-    
 
     public ReadyQueue(OS os, SchedulerType schedulerType) {
         this.os = os;
@@ -18,7 +16,7 @@ public class ReadyQueue {
             case FCFS:
                 s = new FCFS(os);
                 createSchedulerFile("FCFS");
-                
+
                 break;
             case SJF_NP:
                 s = new SJF_NP(os);
@@ -46,6 +44,10 @@ public class ReadyQueue {
                         new RoundRobin(os, 6),
                         new FCFS(os));
                 createSchedulerFile("MFQ");
+                break;
+            case CFS:
+                s = new CFS(os);
+                createSchedulerFile("CFS");
                 break;
             case FAIR:
                 // Implementar si se desea

@@ -1,0 +1,176 @@
+package ur_os;
+
+import java.util.Comparator;
+
+public class RR2 extends Scheduler {
+    private int q;
+    private int cont;
+    private boolean multiQueue;
+    private boolean useAging;
+
+    public RoundRobin(OS os) {
+        super(os);
+        this.q = 5;
+        this.cont = 0;
+        this.multiQueue = false;
+        this.useAging = false;
+    }
+
+    public RoundRobin(OS os, int quantum) {
+        this(os);
+        this.q = quantum;
+    }
+
+    public RoundRobin(OS os, int quantum, boolean multiQueue) {
+        this(os);
+        this.q = quantum;
+        this.multiQueue = multiQueue;
+    }
+
+    public RoundRobin(OS os, int quantum, boolean multiQueue, boolean useAging) {
+        this(os);
+        this.q = quantum;
+        this.multiQueue = multiQueue;
+        this.useAging = useAging;
+    }
+
+    @Override
+    public void addProcess(Process p) {
+        super.addProcess(p);
+        if (useAging) {
+            processes.sort(new Comparator<Process>() {
+                @Override
+                public int compare(Process p1, Process p2) {
+                    return Integer.compare(p2.getPriority(), p1.getPriority());
+                }
+            });
+        }
+    }
+
+    @Override
+    public void getNext(boolean newProcess) {
+        if (!newProcess) {
+            cont++;
+            if (cont > q) {
+                if (multiQueue) {
+                    Process cpuProc = os.getProcessInCPU();
+                    cpuProc.setPriority(cpuProc.getPriority() + 1);
+                    cpuProc.setCurrentScheduler(cpuProc.getPriority());
+                    if (!processes.isEmpty()) {
+                        os.interrupt(InterruptType.SCHEDULER_CPU_TO_RQ, processes.remove(0));
+                    } else {
+                        os.interrupt(InterruptType.SCHEDULER_CPU_TO_RQ, null);
+                    }
+                } else if (!processes.isEmpty()) {
+                    if (!useAging) {
+                        os.interrupt(InterruptType.SCHEDULER_CPU_TO_RQ, processes.remove(0));
+                    } else {
+                        os.getProcessInCPU().increaseContextSwitches();
+                    }
+                }
+                cont = 1;
+            }
+        } else {
+            if (!processes.isEmpty()) {
+                os.interrupt(InterruptType.SCHEDULER_RQ_TO_CPU, processes.remove(0));
+                cont = 1;
+            }
+        }
+    }
+
+    @Override
+    public void newProcess(boolean fromIO) {
+        // No-op for standard RR
+    }
+
+    @Override
+    public void IOReturningProcess(boolean fromIO) {
+        // No-op for standard RR
+    }
+}
+
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package ur_os;
+
+import java.util.*;
+
+/**
+ * Priority Queue Scheduler Implementation
+ * Based on Operating System Concepts by Silberschatz, Galvin, and Gagne
+ *
+ * This implements a multilevel priority queue where:
+ * - Lower priority numbers indicate higher priority processes
+ * - Higher priority processes can preempt lower priority ones
+ * - Each priority level uses Round Robin scheduling with different time quanta
+ */
+public class PriorityQueue extends Scheduler {
+
+    int currentScheduler;
+
+    private final ArrayList<Scheduler> schedulers;
+
+    PriorityQueue(OS os){
+        super(os);
+        currentScheduler = -1;
+        schedulers = new ArrayList<>();
+    }
+
+    PriorityQueue(OS os, Scheduler... s){ //Received multiple schedulers for different priority levels
+        this(os);
+        schedulers.addAll(Arrays.asList(s));
+        if(s.length > 0)
+            currentScheduler = 0;
+    }
+
+    @Override
+    public void addProcess(Process p){
+        int targetQueue = p.getPriority();
+        p.setCurrentScheduler(targetQueue);
+        schedulers.get(targetQueue).addProcess(p);
+    }
+
+    void defineCurrentScheduler(){
+        currentScheduler = -1;
+
+        for (int i = 0; i < schedulers.size(); i++) {
+            if(!schedulers.get(i).isEmpty()){
+                currentScheduler = i;
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void getNext(boolean cpuEmpty) {
+        defineCurrentScheduler();
+
+        if (currentScheduler == -1) {
+            return;
+        }
+
+        //if (cpuEmpty) {
+            schedulers.get(currentScheduler).getNext(cpuEmpty);
+        /*} else {
+            schedulers.get(os.getProcessInCPU().getCurrentScheduler()).getNext(false);
+            if(os.isCPUEmpty()) {
+                if (currentScheduler != -1) {
+                    schedulers.get(currentScheduler).getNext(true);
+                    os.getProcessInCPU().increaseContextSwitches();
+                }
+            }
+        }*/
+    }
+
+    @Override
+    public void newProcess(boolean cpuEmpty) {
+    }
+
+    @Override
+    public void IOReturningProcess(boolean cpuEmpty) {
+    }
+}
+
